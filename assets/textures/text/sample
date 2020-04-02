@@ -1,0 +1,8 @@
+# 
+# This texture will only be used by NCurses module.
+# This texture is only a sample and won't be use by any game.
+# It shows how to create a NCurseModule texture.
+#
+CHARACTER:'#'
+COLOR:F,250,80,20
+STYLE:BOLD,ITALIC
