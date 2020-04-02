@@ -10,6 +10,8 @@ namespace arcade
 
 class SFMLModule : public Module
 {
+    private:
+        sf::Vector2u _sizeUnit;
     public:
         SFMLModule();
         ~SFMLModule();
@@ -17,8 +19,8 @@ class SFMLModule : public Module
         /**
          * @brief Create a window of type sf::RenderWindow or WINDOW depending on the graphical lib used.
          * 
-         * @param width Width of the window.
-         * @param height Height of the window.
+         * @param width Width of the window in cols and not in pixels!
+         * @param height Height of the window in rows and not in pixels!
          * @param x X coordinate of the window.
          * @param y Y coordinate of the window.
          * @param title Title of the window.
@@ -59,28 +61,18 @@ class SFMLModule : public Module
         void setObjectCoordinates(std::map<std::string, Object> &gameDatas, const std::string &name, const int &x, const int &y) final;
 
         /**
-         * @brief Set the texture of a given object into game data.
-         * 
-         * @param gameDatas Current game data.
-         * @param sfTexturePath Path to the picture file storing the object texture.
-         * Only displayed for others lib than ncurse.
-         * @param ncTexturePath Path to the Ncurse module texture file.
-         */
-        void setObjectTexture(std::map<std::string, Object> &gamesData, const std::string &name, const std::string &sfTexturePath, const std::string &ncTexturePath) final;
-
-        /**
          * @brief Render all the object of the current game data.
          * 
          * @param gameDatas Current game data.
          */
-        void render(const std::map<std::string, Object> &gamesData) const final;
+        void render(const std::map<std::string, Object> &gamesData) final;
 
         /**
          * @brief Get the value of the current pressed key.
          * 
          * @return int 
          */
-        int getInputs() const final;
+        int getInputs() final;
 };
 
 #endif

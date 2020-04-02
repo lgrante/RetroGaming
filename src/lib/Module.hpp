@@ -24,8 +24,8 @@ namespace arcade
 class Module
 {
     protected:
-        size_t _width;
-        size_t _height;
+        size_t _width; // in pixels
+        size_t _height; // in pixels
         sf::RenderWindow _sfWindow;
         WINDOW *_ncWindow;
     public:
@@ -80,7 +80,7 @@ class Module
          * Only displayed for others lib than ncurse.
          * @param ncTexturePath Path to the Ncurse module texture file.
          */
-        virtual void setObjectTexture(std::map<std::string, Object> &gamesData, const std::string &name, const std::string &sfTexturePath, const std::string &ncTexturePath) = 0;
+        void setObjectTexture(std::map<std::string, Object> &gamesData, const std::string &name, const std::string &sfTexturePath, const std::string &ncTexturePath);
         
         /**
          * @brief Destroy an object from its name.
@@ -88,21 +88,21 @@ class Module
          * @param gamesData Current game data.
          * @param name Name of the object to destroy.
          */
-        virtual void destroyObject(std::map<std::string, Object> &gameDatas, const std::string &name) = 0;
+        void destroyObject(std::map<std::string, Object> &gameDatas, const std::string &name);
 
         /**
          * @brief Render all the object of the current game data.
          * 
          * @param gameDatas Current game data.
          */
-        virtual void render(const std::map<std::string, Object> &gamesData) const = 0;
+        virtual void render(const std::map<std::string, Object> &gamesData) = 0;
 
         /**
          * @brief Get the value of the current pressed key.
          * 
          * @return int 
          */
-        virtual int getInputs() const = 0;
+        virtual int getInputs() = 0;
 };
 
 #endif
