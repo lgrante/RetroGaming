@@ -66,6 +66,14 @@ void NCurseModule::setObjectTexture(std::map<std::string, Object> &gameDatas, co
         it->second.setTexture(sfTexturePath, ncTexturePath);
 }
 
+void NCurseModule::destroyObject(std::map<std::string, Object> &gameDatas, const std::string &name)
+{
+    std::map<std::string, Object>::iterator it = gameDatas.find(name);
+
+    if (it != gameDatas.end())
+        gameDatas.erase(it);
+}
+
 void NCurseModule::render(const std::map<std::string, Object> &gamesData) const
 {
     for (std::pair<std::string, Object> i : gamesData)

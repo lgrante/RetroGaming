@@ -69,6 +69,14 @@ class NCurseModule : public Module
         void setObjectTexture(std::map<std::string, Object> &gamesData, const std::string &name, const std::string &sfTexturePath, const std::string &ncTexturePath) final;
 
         /**
+         * @brief Destroy an object from its name.
+         * 
+         * @param gamesData Current game data.
+         * @param name Name of the object to destroy.
+         */
+        void destroyObject(std::map<std::string, Object> &gameDatas, const std::string &name);
+
+        /**
          * @brief Render all the object of the current game data.
          * 
          * @param gameDatas Current game data.

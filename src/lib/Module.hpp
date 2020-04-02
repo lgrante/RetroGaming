@@ -81,6 +81,14 @@ class Module
          * @param ncTexturePath Path to the Ncurse module texture file.
          */
         virtual void setObjectTexture(std::map<std::string, Object> &gamesData, const std::string &name, const std::string &sfTexturePath, const std::string &ncTexturePath) = 0;
+        
+        /**
+         * @brief Destroy an object from its name.
+         * 
+         * @param gamesData Current game data.
+         * @param name Name of the object to destroy.
+         */
+        virtual void destroyObject(std::map<std::string, Object> &gameDatas, const std::string &name) = 0;
 
         /**
          * @brief Render all the object of the current game data.
