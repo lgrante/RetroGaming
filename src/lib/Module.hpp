@@ -24,18 +24,31 @@ namespace arcade
 class Module
 {
     protected:
-        size_t _width; // in pixels
-        size_t _height; // in pixels
+        struct {
+            size_t w;
+            size_t h;
+            uint16_t wUnit;
+            uint16_t hUnit;
+            uint16_t getWidthInUnit()
+            {
+                return (uint16_t) w / wUnit;
+            }
+            uint16_t getHeightInUnit()
+            {
+                return (uint16_t) h / hUnit;
+            }
+        } _size;
         sf::RenderWindow _sfWindow;
+        SDL_Surface *_sdlWindow;
         WINDOW *_ncWindow;
     public:
         /**
-         * @brief Create a window of type sf::RenderWindow or WINDOW depending on the graphical lib used.
+         * @brief Create a window of type sf::RenderWindow or SDL_Surface* or WINDOW* depending on the graphical lib used.
          * 
-         * @param width Width of the window.
-         * @param height Height of the window.
-         * @param x X coordinate of the window.
-         * @param y Y coordinate of the window.
+         * @param width Width of the window in cols and not in pixels.
+         * @param height Height of the window in rows and not in pixels.
+         * @param x X coordinate of the window in pixels.
+         * @param y Y coordinate of the window in pixels.
          * @param title Title of the window.
          */
         virtual void initWindow(const size_t &width = 800, const size_t &height = 600, const std::string &title = "Arcade Game") = 0;
@@ -45,6 +58,7 @@ class Module
          * 
          */
         virtual void destroyWindow() = 0;
+        
         /**
          * @brief Initialize an object and add it to the game data.
          * 
@@ -52,25 +66,26 @@ class Module
          * @param name Name of the object.
          * @param sfTexturePath Path to the picture file storing the object texture.
          * Only displayed for others lib than ncurse.
+         * @param sdlTexturePath Path to the SDL texture file (must be .bmp file).
          * @param ncTexturePath Path to the Ncurse module texture file.
-         * @param x X coordinate of the object.
-         * @param y Y coordinate of the object.
+         * @param x X coordinate of the object in cols and not in pixels.
+         * @param y Y coordinate of the object in rows and not in pixels.
          */
         virtual void setObject(
-            std::map<std::string, Object> &gameDatas,
-            const std::string &name, const std::string &sfTexturePath, const std::string &ncTexturePath, 
+            std::map<std::string, Object> &gameDatas, const std::string &name, 
+            const std::string &sfTexturePath, const std::string &sdlTexturePath, const std::string &ncTexturePath, 
             const int &x = 0, const int &y = 0
-        ) = 0;
+        );
 
         /**
          * @brief Set the coordinates of a given object into game data.
          * 
          * @param gameDatas Current game data.
          * @param name Name of the object.
-         * @param x X coordinate of the object.
-         * @param y Y coordinate of the object.
+         * @param x X coordinate of the object in cols and not in pixels.
+         * @param y Y coordinate of the object in rows and not in pixels.
          */
-        virtual void setObjectCoordinates(std::map<std::string, Object> &gameDatas, const std::string &name, const int &x, const int &y) = 0;
+        virtual void setObjectCoordinates(std::map<std::string, Object> &gameDatas, const std::string &name, const int &x, const int &y);
 
         /**
          * @brief Set the texture of a given object into game data.
@@ -79,8 +94,9 @@ class Module
          * @param sfTexturePath Path to the picture file storing the object texture.
          * Only displayed for others lib than ncurse.
          * @param ncTexturePath Path to the Ncurse module texture file.
+         * @param sdlTexturePath Path to the SDL texture file (must be .bmp file).
          */
-        void setObjectTexture(std::map<std::string, Object> &gamesData, const std::string &name, const std::string &sfTexturePath, const std::string &ncTexturePath);
+        virtual void setObjectTexture(std::map<std::string, Object> &gamesData, const std::string &name, const std::string &sfTexturePath, const std::string &sdlTexturePath, const std::string &ncTexturePath);
         
         /**
          * @brief Destroy an object from its name.
@@ -88,7 +104,7 @@ class Module
          * @param gamesData Current game data.
          * @param name Name of the object to destroy.
          */
-        void destroyObject(std::map<std::string, Object> &gameDatas, const std::string &name);
+        virtual void destroyObject(std::map<std::string, Object> &gameDatas, const std::string &name);
 
         /**
          * @brief Render all the object of the current game data.

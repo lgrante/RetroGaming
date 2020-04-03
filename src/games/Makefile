@@ -29,7 +29,7 @@ all: $(OBJ_A) $(OBJ_B)
 
 %.o: %.cpp
 	@printf "\e[38;2;21;124;214m>\tCompiling $<...\033[0m  "
-	@$(CC) -o $@ $(CXXFLAGS) $(SFMLFLAGS) $<
+	@$(CC) -o $@ $(CXXFLAGS) $(LIBFLAGS) $<
 	@printf "Done.\n"
 
 clean:

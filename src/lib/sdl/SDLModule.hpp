@@ -1,18 +1,18 @@
-#ifndef __SFML_MODULE_H__
-#define __SFML_MODULE_H__
+#ifndef __SDL_MODULE_H__
+#define __SDL_MODULE_H__
 
 #include "Module.hpp"
 
 namespace arcade
 {
-    class SFMLModule;
+    class SDLModule;
 }
 
-class SFMLModule : public Module
+class SDLModule : public Module
 {
     public:
-        SFMLModule();
-        ~SFMLModule();
+        SDLModule();
+        ~SDLModule();
 
         /**
          * @brief Create a window of type sf::RenderWindow or SDL_Surface* or WINDOW* depending on the graphical lib used.

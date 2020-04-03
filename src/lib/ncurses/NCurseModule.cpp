@@ -29,35 +29,16 @@ void NCurseModule::initWindow(const size_t &width, const size_t &height, const s
     keypad_stat = keypad(_ncWindow, TRUE);
     if (keypad_stat == ERR)
         throw InitKeyException("Failed to enable user's keypad", __LINE__);
+    _size.w = width;
+    _size.h = height;
+    _size.wUnit = 1;
+    _size.hUnit = 1;
 }
 
 void NCurseModule::destroyWindow()
 {
     endwin();
     delete (_ncWindow);
-}
-
-void NCurseModule::setObject(
-    std::map<std::string, Object> &gameDatas,
-    const std::string &name, const std::string &sfTexturePath, const std::string &ncTexturePath, 
-    const int &x, const int &y
-)
-{
-    if (x >= 0 && x < (int) _width && y >= 0 && y < (int) _height) {
-        Object newObject(sfTexturePath, ncTexturePath, x, y);
-
-        gameDatas.emplace(name, newObject);
-    }
-}
-
-void NCurseModule::setObjectCoordinates(std::map<std::string, Object> &gameDatas, const std::string &name, const int &x, const int &y)
-{
-    std::map<std::string, Object>::iterator it = gameDatas.find(name);
-
-    if (it != gameDatas.end() && x >= 0 && x < (int) _width && y >= 0 && y < (int) _height) {
-        it->second.setX(x);
-        it->second.setY(y);
-    }
 }
 
 void NCurseModule::render(const std::map<std::string, Object> &gamesData)

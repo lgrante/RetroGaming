@@ -3,6 +3,8 @@
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 
+#include <SDL/SDL.h>
+
 #include <functional>
 #include <vector>
 #include <iterator>

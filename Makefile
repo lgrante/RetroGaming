@@ -1,11 +1,13 @@
 SRC					=	./src/Core.cpp \
-						./src/lib/ncurses/NCurseTexture.cpp \
 						./src/games/Game.cpp \
+						./src/lib/Module.cpp \
+						./src/lib/Object.cpp \
+						./src/lib/ncurses/NCurseTexture.cpp \
 						./src/main.cpp
 
 export CC			=	g++
 export RM			=	rm -f
-export SFMLFLAGS	=	-lsfml-graphics -lsfml-system -lsfml-window -lsfml-audio
+export LIBFLAGS	=	-lsfml-graphics -lsfml-system -lsfml-window -lSDL
 CXXFLAGS			=	-Wall -Wextra -Wno-delete-non-virtual-dtor -pedantic -I./src -I./src/games -I./src/lib -I./src/lib/ncurses -ldl
 
 export LIB_PREFIX	=	lib_arcade_
@@ -17,7 +19,7 @@ all: core games graphicals
 
 core:
 	@printf "\e[1m\e[38;2;21;124;214mCompiling and linking $(EXEC)...\033[0m\n"
-	@$(CC) -o $(EXEC) $(SRC) $(CXXFLAGS) $(SFMLFLAGS)
+	@$(CC) -o $(EXEC) $(SRC) $(CXXFLAGS) $(LIBFLAGS)
 	@printf "\e[1m> Done.\033[0m\n"
 
 games:
