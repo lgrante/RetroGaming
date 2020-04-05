@@ -94,22 +94,110 @@ std::vector<std::string> Core::_readDirectory(const std::string &path)
     return files;
 }
 
-void Core::launch(const std::string &lib)
+std::map<int, std::pair<std::string, std::string>, std::greater<int>> Core::_readScores()
+{
+    std::map<int, std::pair<std::string, std::string>, std::greater<int>> userScores;
+    std::string line;
+    std::ifstream file(SCORE_PATH);
+
+    if (file) {
+        while (std::getline(file, line)) {
+            std::vector<std::string> words = _splitStr(line, ':');
+            char *checkNbr = nullptr;
+            long score = 0;
+
+            if (line[0] == '#' || line.size() == 0 || line[0] == '\n')
+                continue;
+            if (words.size() != 3)
+                throw LoadUserScoresException("Wrong syntax in user scores files", __FILE__, __LINE__);
+            score = std::strtol(words[1].c_str(), &checkNbr, 10);
+            if (*checkNbr)
+                throw LoadUserScoresException("Wrong syntax in user scores files", __FILE__, __LINE__);
+            userScores.emplace((int) score, std::pair<std::string, std::string>(words[0], words[2]));
+        }
+    } else
+        throw LoadUserScoresException("Failed to open user scores files", __FILE__, __LINE__);
+    return userScores;
+}
+
+std::vector<std::string> Core::_splitStr(const std::string &line, char split)
+{
+    std::vector<std::string> words;
+    std::stringstream stream(line);
+    std::string word;
+
+    while (std::getline(stream, word, split)) {
+        if (word.size() != 0)
+            words.push_back(word);
+    }
+    return words;
+}
+
+void Core::_readModuleKey(int key)
+{
+    switch (key) {
+        case 'a':
+            _currentLib = (_currentLib == _libs.begin()) ? (_libs.end() - 1) : _currentLib - 1;
+            break;
+        case 'z':
+            _currentLib = (_currentLib == _libs.end() - 1) ? (_libs.begin()) : _currentLib + 1;
+            break;
+        case 'o':
+            _currentGame = (_currentGame == _games.begin()) ? (_games.end() - 1) : _currentGame - 1;
+            break;
+        case 'p':
+            _currentGame = (_currentGame == _games.end() - 1) ? (_games.begin()) : _currentGame + 1;
+            break;
+    }
+    if (key == 'a' || key == 'z') {
+        _module->destroyWindow();
+        setModule("./lib/" + *_currentLib);
+        _module->initWindow(100, 40, "ARCADE");
+    }
+}
+
+void Core::_scoreMenu(const std::string &lib)
+{
+    int i = 1, input = -1;
+    bool exit = false;
+    
+    _module->clear();
+    while (!exit) {
+        i = 1;
+        _module->renderText("Score menu", 0, 2, TOP | CENTER, BOLD | UNDERLINE);
+        _module->renderText("[Q]/[ESC]: Quit score menu", 0, 6, TOP | CENTER, ITALIC);
+        if (_scores.size() == 0)
+            std::cout << "No scores..." << std::endl;
+        else {
+            for (auto it : _scores) {
+                _module->renderText(std::to_string(i) + ". " + it.second.first, 25, 8 + i, TOP | LEFT, BOLD);
+                _module->renderText(":", 0, 8 + i, TOP | CENTER);
+                _module->renderText(std::to_string(it.first) + "(" + it.second.second + ")", -25, 8 + i, TOP | RIGHT, NORMAL, GREEN);
+                i++;
+            }
+        }
+        switch ((input = _module->getInputs())) {
+            case 'q':
+            case 27:
+                exit = true;
+                break;
+            default:
+                _readModuleKey(input);
+        }
+    }
+    _mainMenu(lib);
+}
+
+void Core::_mainMenu(const std::string &lib)
 {
     bool exit = false, insertMode = false;
     int input = 0;
     std::string username = "";
-    /**
-     * @note Get the list of libs and games
-     */
-    std::vector<std::string> libs = _readDirectory("./lib");
-    std::vector<std::string> games = _readDirectory("./games");
-    std::vector<std::string>::iterator currentLib = std::find(libs.begin(), libs.end(), lib.substr(4));
-    std::vector<std::string>::iterator currentGame = games.begin();
 
-    if (_module == nullptr)
-        return;
-    _module->initWindow(100, 40, "ARCADE");
+    _module->clear();
+    /**
+     * @note Main loop to display menu.
+     */
     while (!exit) {
         /**
          * @note First display the keys.
@@ -120,19 +208,20 @@ void Core::launch(const std::string &lib)
         _module->renderText("[O]: Previous game / [P]: Next game", 0, 8, TOP | CENTER, ITALIC);
         _module->renderText("[I]: Insert your username, insert mode: ", 0, 9, TOP | CENTER, ITALIC);
         _module->renderText((insertMode) ? "activated" : "disabled", 25, 9, TOP | CENTER, NORMAL, (insertMode) ? CYAN : RED);
-        _module->renderText("[ENTER]: Launch game!", 0, 10, TOP | CENTER, ITALIC);
+        _module->renderText("[S]: Users scores", 0, 10, TOP | CENTER, ITALIC);
+        _module->renderText("[ENTER]: Launch game!", 0, 11, TOP | CENTER, ITALIC);
 
         /**
          * @note Then display the games and libs.
          */
-        _module->renderText((libs.size() == 0) ? "No libs found..." : "List of library:", 0, 14, TOP | CENTER, BOLD);
-        for (size_t i = 0; i < libs.size(); i++)
-            _module->renderText(libs[i], 0, 16 + i, TOP | CENTER, NORMAL, (libs[i] == *currentLib) ? CYAN : WHITE);
-        _module->renderText((games.size() == 0) ? "No games found..." : "List of game:", 0, 22, TOP | CENTER, BOLD);
-        for (size_t i = 0; i < games.size(); i++)
-            _module->renderText(games[i], 0, 24 + i, TOP | CENTER, NORMAL, (games[i] == *currentGame) ? CYAN : WHITE);
-        _module->renderText("USERNAME", 0, 30, TOP | CENTER, BOLD | ITALIC);
-        _module->renderText(username, 0, 31, TOP | CENTER, ITALIC);
+        _module->renderText((_libs.size() == 0) ? "No libs found..." : "List of library:", 0, 15, TOP | CENTER, BOLD);
+        for (size_t i = 0; i < _libs.size(); i++)
+            _module->renderText(_libs[i], 0, 17 + i, TOP | CENTER, NORMAL, (_libs[i] == *_currentLib) ? CYAN : WHITE);
+        _module->renderText((_games.size() == 0) ? "No games found..." : "List of game:", 0, 23, TOP | CENTER, BOLD);
+        for (size_t i = 0; i < _games.size(); i++)
+            _module->renderText(_games[i], 0, 25 + i, TOP | CENTER, NORMAL, (_games[i] == *_currentGame) ? CYAN : WHITE);
+        _module->renderText("USERNAME", 0, 31, TOP | CENTER, BOLD | ITALIC);
+        _module->renderText("[" + username + "]", 0, 32, TOP | CENTER, ITALIC);
 
         /**
          * @note And last we read the keys pressed by user and process it.
@@ -146,36 +235,43 @@ void Core::launch(const std::string &lib)
         } else if (input == 27 && insertMode) {
             _module->clear();
             insertMode = false;
-        }
-        else if (!insertMode) {
+        } else if (!insertMode) {
             switch (input) {
                 case 'q':
                 case 27:
                     exit = true;
                     break;
-                case 'a':
-                    currentLib = (currentLib == libs.begin()) ? (libs.end() - 1) : currentLib - 1;
-                    break;
-                case 'z':
-                    currentLib = (currentLib == libs.end() - 1) ? (libs.begin()) : currentLib + 1;
-                    break;
-                case 'o':
-                    currentGame = (currentGame == games.begin()) ? (games.end() - 1) : currentGame - 1;
-                    break;
-                case 'p':
-                    currentGame = (currentGame == games.end() - 1) ? (games.begin()) : currentGame + 1;
-                    break;
                 case 'i':
                     _module->clear();
                     insertMode = true;
                     break;
-            }
-            if (input == 'a' || input == 'z') {
-                _module->destroyWindow();
-                setModule("./lib/" + *currentLib);
-                _module->initWindow(100, 40, "ARCADE");
+                case 's':
+                    _scoreMenu(lib);
+                default:
+                    _readModuleKey(input);
             }
         }
     }
+}
+
+void Core::launch(const std::string &lib)
+{
+    if (_module == nullptr)
+        return;
+
+    /**
+     * @note Get the list of libs and games.
+     */
+    _libs = _readDirectory("./lib");
+    _games = _readDirectory("./games");
+    _currentLib = std::find(_libs.begin(), _libs.end(), lib.substr(4));
+    _currentGame = _games.begin();
+    _scores = _readScores();
+
+    /**
+     * @note Open the main menu.
+     */
+    _module->initWindow(100, 40, "ARCADE");
+    _mainMenu(lib);
     _module->destroyWindow();
 }

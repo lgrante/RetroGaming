@@ -2,9 +2,13 @@
 #
 # Scores will be stored in this format
 #
-# USERNAME1:SCORE1
-# USERNAME2:SCORE2
+# USERNAME1:SCORE1:GAME_A
+# USERNAME2:SCORE2:GAME_B
 #
 # Comment line begin with '#'
 #
 ##
+
+Louis:2000:Pacman
+Vincent:3500:Qix
+Thomas:3600:Qix

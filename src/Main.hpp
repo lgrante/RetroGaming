@@ -20,3 +20,5 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <dlfcn.h>
+#include <cstdlib>

@@ -7,7 +7,7 @@
 #include "Object.hpp"
 #include "Errors.hpp"
 
-#include <dlfcn.h>
+#define SCORE_PATH "./assets/scores"
 
 namespace arcade
 {
@@ -40,7 +40,13 @@ class Core
         void (*_moduleDestroyer)(Module *);
         Game *_game;
         void (*_gameDestroyer)(Game *);
-    
+
+        std::vector<std::string> _libs;
+        std::vector<std::string> _games;
+        std::vector<std::string>::iterator _currentLib;
+        std::vector<std::string>::iterator _currentGame;
+        std::map<int, std::pair<std::string, std::string>, std::greater<int>> _scores;
+
         template <typename T>
         T *_loadSharedClass(const std::string &libPath, void (**destroyer)(T *))
         {
@@ -61,6 +67,12 @@ class Core
         }
 
         std::vector<std::string> _readDirectory(const std::string &path);
+        std::map<int, std::pair<std::string, std::string>, std::greater<int>> _readScores();
+        std::vector<std::string> _splitStr(const std::string &line, char split);
+
+        void _readModuleKey(int key);
+        void _scoreMenu(const std::string &lib);
+        void _mainMenu(const std::string &lib);
     public:
         Core();
         Core(const std::string &gamePath, const std::string &modulePath);

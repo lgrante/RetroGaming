@@ -26,6 +26,13 @@ class LoadSharedModuleException : public ArcadeException
             : ArcadeException(error, line, filename, "LoadSharedModuleException") {}
 };
 
+class LoadUserScoresException : public ArcadeException
+{
+    public:
+        LoadUserScoresException(std::string error, const char *filename, uint16_t line) 
+            : ArcadeException(error, line, filename, "LoadUserScoresException") {}
+};
+
 class InitWindowException : public ArcadeException
 {
     public:
