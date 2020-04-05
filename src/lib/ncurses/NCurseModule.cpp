@@ -104,5 +104,9 @@ void NCurseModule::clear()
 
 int NCurseModule::getInputs()
 {
-    return wgetch(_ncWindow);
+    int key = wgetch(_ncWindow);
+    
+    if (key == 263)
+        return 8;
+    return key;
 }

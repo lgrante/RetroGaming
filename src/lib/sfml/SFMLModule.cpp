@@ -46,7 +46,6 @@ void SFMLModule::renderText(const std::string &text, const int &x, const int &y,
     sf::Font font;
     sf::Text renderText;
     sf::FloatRect rect;
-    sf::RectangleShape empty;
     int xPxl = x, yPxl = y;
     std::map<enum color, sf::Color> sfColors = {
         {BLACK, sf::Color(0, 0, 0)},
@@ -78,11 +77,6 @@ void SFMLModule::renderText(const std::string &text, const int &x, const int &y,
     _computeTextPosition(xPxl, yPxl, alignment, rect.width);
     renderText.setPosition(xPxl, yPxl);
 
-    empty.setSize(sf::Vector2f(rect.width + 30, rect.height));
-    empty.setPosition(sf::Vector2f(xPxl, yPxl + 10));
-    empty.setFillColor(sf::Color(0, 0, 0));
-
-    //_sfWindow->draw(empty);
     _sfWindow->draw(renderText);
     _sfWindow->display();
 }
@@ -96,11 +90,8 @@ int SFMLModule::getInputs()
 {
     sf::Event event;
 
-    while (_sfWindow->pollEvent(event)) {
-        if (event.type == sf::Event::TextEntered) {
-            std::cout << "Key pressed: " << event.text.unicode << std::endl;
+    while (_sfWindow->pollEvent(event))
+        if (event.type == sf::Event::TextEntered)
             return event.text.unicode;
-        }
-    }
     return -1;
 }

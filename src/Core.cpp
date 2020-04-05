@@ -21,7 +21,7 @@ void Core::setModule(const std::string &path)
         _moduleDestroyer(_module);
     else if (_module != nullptr)
         delete(_module);
-
+    
     /**
      * @note Then we load the new module and we store it into the game instance.
      */
@@ -117,7 +117,7 @@ void Core::launch(const std::string &lib)
         _module->renderText("Welcome on Arcade !", 0, 2, TOP | CENTER, BOLD | UNDERLINE, CYAN);
         _module->renderText("[Q]/[ESC]: Quit the program", 0, 6, TOP | CENTER, ITALIC);
         _module->renderText("[A]: Previous lib / [Z]: Next lib", 0, 7, TOP | CENTER, ITALIC);
-        _module->renderText("[O]: Previous game / [P]: Next lib", 0, 8, TOP | CENTER, ITALIC);
+        _module->renderText("[O]: Previous game / [P]: Next game", 0, 8, TOP | CENTER, ITALIC);
         _module->renderText("[I]: Insert your username, insert mode: ", 0, 9, TOP | CENTER, ITALIC);
         _module->renderText((insertMode) ? "activated" : "disabled", 25, 9, TOP | CENTER, NORMAL, (insertMode) ? CYAN : RED);
         _module->renderText("[ENTER]: Launch game!", 0, 10, TOP | CENTER, ITALIC);
@@ -137,12 +137,13 @@ void Core::launch(const std::string &lib)
         /**
          * @note And last we read the keys pressed by user and process it.
          */
-        if ((input = _module->getInputs()) != 127 && input != 27 && input != -1 && insertMode) {
+        if ((input = _module->getInputs()) != 8 && input != 27 && input != -1 && insertMode && username.size() <= 16) {
             _module->clear();
             username.push_back(input);
-        } else if (input == 127 && insertMode)
+        } else if (input == 8 && insertMode && username.size() > 0) {
+            _module->clear();
             username.pop_back();
-        else if (input == 27 && insertMode) {
+        } else if (input == 27 && insertMode) {
             _module->clear();
             insertMode = false;
         }
@@ -169,8 +170,11 @@ void Core::launch(const std::string &lib)
                     insertMode = true;
                     break;
             }
-            if (input == 'a' || input == 'z')
-                setModule(*currentLib);
+            if (input == 'a' || input == 'z') {
+                _module->destroyWindow();
+                setModule("./lib/" + *currentLib);
+                _module->initWindow(100, 40, "ARCADE");
+            }
         }
     }
     _module->destroyWindow();
