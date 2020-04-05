@@ -37,22 +37,25 @@ void Core::setGame(const std::string &path)
     /**
      * @note First we save the current game data and then we destroy it. 
      */
-    it = _gamesData.find(_game->getName());
-    if (it == _gamesData.end())
-        _gamesData.emplace(_game->getName(), _game->getData());
-    else
-        _gamesData.at(_game->getName()) = _game->getData();
-    if (_gameDestroyer != nullptr)
-        _gameDestroyer(_game);
-    else if (_game != nullptr)
-        delete(_game);
+    if (_game != nullptr) {
+        it = _gamesData.find(_game->getName());
+        if (it == _gamesData.end())
+            _gamesData.emplace(_game->getName(), _game->getData());
+        else
+            _gamesData.at(_game->getName()) = _game->getData();
+        if (_gameDestroyer != nullptr)
+            _gameDestroyer(_game);
+        else if (_game != nullptr)
+            delete(_game);
+    }
 
     /**
      * @note We load the new game and store the current module in the new
      * loaded game.
      */
     _game = _loadSharedClass<Game>(path, &_gameDestroyer);
-    _game->setModule(_module);
+    if (_module != nullptr)
+        _game->setModule(_module);
 
     /**
      * @note We launch the game and if the game has alredy been loaded before
@@ -133,7 +136,7 @@ std::vector<std::string> Core::_splitStr(const std::string &line, char split)
     return words;
 }
 
-void Core::_readModuleKey(int key)
+void Core::_readModuleKey(const int &key, bool &exit)
 {
     switch (key) {
         case 'a':
@@ -147,6 +150,10 @@ void Core::_readModuleKey(int key)
             break;
         case 'p':
             _currentGame = (_currentGame == _games.end() - 1) ? (_games.begin()) : _currentGame + 1;
+            break;
+        case 'q':
+        case 27:
+            exit = true;
             break;
     }
     if (key == 'a' || key == 'z') {
@@ -177,12 +184,8 @@ void Core::_scoreMenu(const std::string &lib)
             }
         }
         switch ((input = _module->getInputs())) {
-            case 'q':
-            case 27:
-                exit = true;
-                break;
             default:
-                _readModuleKey(input);
+                _readModuleKey(input, exit);
         }
     }
     _mainMenu(lib);
@@ -247,8 +250,13 @@ void Core::_mainMenu(const std::string &lib)
                     break;
                 case 's':
                     _scoreMenu(lib);
+                    break;
+                case 13:
+                    _module->clear();
+                    setGame("./games/" + *_currentGame);
+                    break;
                 default:
-                    _readModuleKey(input);
+                    _readModuleKey(input, exit);
             }
         }
     }

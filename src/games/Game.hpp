@@ -26,11 +26,10 @@ class Game
         Module *_module;
         std::map<std::string, Object> _data;
     public:
-        virtual ~Game() = 0;
-
         const std::string &getName() const;
         Module *getModule() const;
         const std::map<std::string, Object> &getData() const;
+        const int &getCurrentInput() const;
 
         void setName(const std::string &name);
         void setModule(Module *module);
@@ -38,14 +37,47 @@ class Game
 
         /**
          * @brief Initialize the _data map then call coreGame().
+         * Call coreGame() in loop until isEndGame() returns false.
+         * If isEndGame() returns true its calls endGame() in loop
+         * until isGameRestart() returns false.
          * 
          */
-        virtual void launchGame() = 0;
+        void launchGame();
+
         /**
-         * @brief The game loop.
+         * @brief The inside of the game loop
          * 
+         * @param key Every user input have to stored into key parameter
+         * so that the core class can process it 
+         * (if user change lib/game or quit the arcade).
          */
-        virtual void coreGame() = 0;
+        virtual void coreGame(int &key) = 0;
+
+        /**
+         * @brief The screen to disaplay when game is over.
+         * 
+         * @param key Every user input have to stored into key parameter
+         * so that the core class can process it.
+         * (if user change lib/game or quit the arcade).
+         */
+        virtual void endGame(int &key) = 0;
+
+        /**
+         * @brief This is function is called in loop at the game end.
+         * It returns true if players choose to restart. False if not.
+         * 
+         * @return true
+         * @return false
+         */
+        virtual bool isGameRestart() = 0;
+        /**
+         * @brief This function is called at each game loop.
+         * It returns true if game is over. False if not.
+         * 
+         * @return true 
+         * @return false 
+         */
+        virtual bool isEndGame() = 0;
 };
 
 #endif

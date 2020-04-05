@@ -15,6 +15,11 @@ const std::map<std::string, Object> &Game::getData() const
     return _data;
 }
 
+const int &Game::getCurrentInput() const
+{
+    return _module->getInputs();
+}
+
 void Game::setName(const std::string &name)
 {
     _name = name;

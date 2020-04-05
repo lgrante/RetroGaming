@@ -2,10 +2,11 @@ SRC_A				=	./gameA/GameA.cpp \
 						./Game.cpp
 OBJ_A				=	$(SRC_A:.cpp=.o)
 
-SRC_B				=	./gameB/GameB.cpp
+SRC_B				=	./gameB/GameB.cpp \
+						./Game.cpp
 OBJ_B				=	$(SRC_B:.cpp=.o)
 
-CXXFLAGS			=	-Wall -Wextra -Wno-delete-non-virtual-dtor -pedantic -I../ -I./gameA -I./gameB -I../lib -I../lib/ncurses -c -fpic
+CXXFLAGS			=	-Wall -Wextra -Wno-delete-non-virtual-dtor -pedantic -I../ -I./ -I./gameA -I./gameB -I../lib -I../lib/ncurses -c -fpic
 LDFLAGS				=	-shared
 
 BUILD_DIR			=	../../build

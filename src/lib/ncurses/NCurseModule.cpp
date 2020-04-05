@@ -108,5 +108,7 @@ int NCurseModule::getInputs()
     
     if (key == 263)
         return 8;
+    if (key == 10)
+        return 13;
     return key;
 }

@@ -1,47 +1,31 @@
-#include <iostream>
-#include <vector>
-#include <ncurses.h>
-#include <cstdlib>
-#include <ctime>
-#ifndef FSNAKEGAME_H
-#define FSNAKEGAME_H
+#ifndef __NIBBLER_H__
+#define __NIBBLER_H__
 
-struct CharPosition
+#include "Main.hpp"
+#include "Module.hpp"
+#include "Game.hpp"
+
+namespace arcade
 {
-    int x;
-    int y;
-    CharPosition(int col, int row);
-    CharPosition();
-};
+    class NibblerGame;
+}
 
-class fSnakeGame
+class NibblerGame : public Game
 {
-private:
-    int score = 0;
-    int del = 110000;
-    int maxwidth;
-    int maxheight;
-    char direction = 'l';
-    char partchar = 'x';
-    char edgechar = (char)219;;
-    char fruitchar = '*';
-    bool eatsFruit = 0;
-    CharPosition fruit;
-    std::vector<CharPosition> snake;
+    public:
+        NibblerGame();
+        ~NibblerGame();
 
-    void InitGameWindow();
-    void DrawWindow();
-    void DrawSnake();
-    void PrintScore();
-    void posFruit();
-    bool Collision();
-    void MoveSnake();
-    bool GetsFruit();
-
-public:
-    fSnakeGame();
-    ~fSnakeGame();
-    void PlayGame();
+        /**
+         * @brief Initialize the _data map then call coreGame().
+         * 
+         */
+        void launchGame();
+        /**
+         * @brief The game loop.
+         * 
+         */
+        void coreGame();
 };
 
 #endif

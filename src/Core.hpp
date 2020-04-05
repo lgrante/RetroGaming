@@ -70,7 +70,7 @@ class Core
         std::map<int, std::pair<std::string, std::string>, std::greater<int>> _readScores();
         std::vector<std::string> _splitStr(const std::string &line, char split);
 
-        void _readModuleKey(int key);
+        void _readModuleKey(const int &key, bool &exit);
         void _scoreMenu(const std::string &lib);
         void _mainMenu(const std::string &lib);
     public:
