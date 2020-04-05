@@ -84,7 +84,8 @@ class Module
             }
         } _size;
         sf::RenderWindow *_sfWindow;
-        SDL_Surface *_sdlWindow;
+        SDL_Window *_sdlWindow;
+        SDL_Renderer *_sdlRenderer;
         WINDOW *_ncWindow;
 
         module _module;

@@ -17,7 +17,7 @@ class Object
 
         sf::Sprite _sprite;
         sf::Texture _sfTexture;
-        SDL_Surface *_sdlTexture;
+        SDL_Texture *_sdlTexture;
         NCurseTexture _ncTexture;
     public:
         Object() = default;
@@ -32,7 +32,7 @@ class Object
 
         const sf::Sprite &getSfSprite() const;
         const sf::Texture &getSfTexture() const;
-        SDL_Surface *getSdlTexture() const;
+        SDL_Texture *getSdlTexture() const;
         const NCurseTexture &getNcTexture() const;
         const int &getX() const;
         const int &getY() const;

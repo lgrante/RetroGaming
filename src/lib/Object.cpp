@@ -13,7 +13,7 @@ Object::Object(const std::string &sfTexturePath, const std::string &ncTexturePat
 
 void Object::setTexture(const std::string &sfTexturePath, const std::string &ncTexturePath, const std::string &sdlTexturePath)
 {
-    SDL_Surface *buffer = NULL;
+    SDL_Surface *buffer = nullptr;
 
     /**
      * @note Loading SFML Texture.
@@ -25,9 +25,10 @@ void Object::setTexture(const std::string &sfTexturePath, const std::string &ncT
     /**
      * @note Loading SDL Texture.
      */
-    buffer = SDL_LoadBMP(sdlTexturePath.c_str());
-	_sdlTexture = SDL_DisplayFormat(buffer);
-	SDL_FreeSurface(buffer);
+    /*
+    buffer = IMG_Load(sdlTexturePath.c_str());
+    _sdlTexture = SDL_CreateTextureFromSurface()
+    */
 
     /**
      * @note Loading NCurse Texture.
@@ -65,7 +66,7 @@ const sf::Texture &Object::getSfTexture() const
     return _sfTexture;
 }
 
-SDL_Surface *Object::getSdlTexture() const
+SDL_Texture *Object::getSdlTexture() const
 {
     return _sdlTexture;
 }

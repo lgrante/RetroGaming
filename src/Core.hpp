@@ -48,8 +48,10 @@ class Core
             T *(*create)() = nullptr;
             void *handle = dlopen(libPath.c_str(), RTLD_LAZY);
 
-            if (handle == nullptr)
+            if (handle == nullptr) {
+                std::cerr << dlerror() << std::endl;
                 throw LoadSharedModuleException("Failed to load " + libPath, __FILE__, __LINE__);
+            }
             create = (T *(*)()) dlsym(handle, "create");
             *destroyer = (void (*)(T *)) dlsym(handle, "destroy");
             if (create == nullptr || *destroyer == nullptr)

@@ -57,7 +57,7 @@ class SDLModule : public Module
          * @brief Clear the whole screen.
          * 
          */
-        void clear();
+        void clear() final;
         
         /**
          * @brief Get the value of the current pressed key.

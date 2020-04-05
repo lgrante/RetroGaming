@@ -65,8 +65,10 @@ void Module::destroyObject(std::map<std::string, Object> &gameDatas, const std::
     std::map<std::string, Object>::iterator it = gameDatas.find(name);
 
     if (it != gameDatas.end()) {
+        /*
         if (it->second.getSdlTexture() != nullptr)
             SDL_FreeSurface(it->second.getSdlTexture());
+            */
         gameDatas.erase(it);
     }
 }

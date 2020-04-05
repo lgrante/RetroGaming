@@ -7,8 +7,8 @@ SRC					=	./src/Core.cpp \
 
 export CC			=	g++
 export RM			=	rm -f
-export LIBFLAGS		=	-lsfml-graphics -lsfml-system -lsfml-window -lSDL -lncurses -ltinfo
-CXXFLAGS			=	-Wall -Wextra -Wno-delete-non-virtual-dtor -pedantic -ldl -I./src -I./src/games -I./src/lib -I./src/lib/ncurses
+export LIBFLAGS		=	-lsfml-graphics -lsfml-system -lsfml-window -lSDL2 -lSDL2_ttf -lSDL2_image -lncurses -ltinfo
+CXXFLAGS			=	-g3 -Wall -Wextra -Wno-delete-non-virtual-dtor -pedantic -ldl -I./src -I./src/games -I./src/lib -I./src/lib/ncurses
 
 export LIB_PREFIX	=	lib_arcade_
 GAMES_DIR			=	./src/games
