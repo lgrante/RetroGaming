@@ -5,10 +5,54 @@
 #include "Object.hpp"
 #include "Errors.hpp"
 
+#define FONT_PATH "./assets/fonts/main_font.ttf"
+#define BG_PATH "./assets/texture/bg.jpeg"
+
+#define COLS 159
+#define ROWS 42
+
 namespace arcade
 {
     class Module;
 }
+
+enum module {
+    SFML,
+    SDL,
+    NCURSE
+};
+
+/**
+ * @note It's possible to combine the flags like this:
+ * LEFT | TOP // This will write the text in the top left corner of the screen.
+ * 
+ */
+enum textAlignement {
+    LEFT        = 1 << 0,
+    CENTER      = 1 << 1,
+    RIGHT       = 1 << 2,
+    TOP         = 1 << 3,
+    MIDDLE      = 1 << 4,
+    BOTTOM      = 1 << 5
+};
+
+enum textStyle {
+    NORMAL      = 1 << 0,
+    BOLD        = 1 << 1,
+    ITALIC      = 1 << 2,
+    UNDERLINE   = 1 << 3
+};
+
+enum color {
+    BLACK,
+    RED,
+    GREEN,
+    YELLOW,
+    BLUE,
+    MAGENTA,
+    CYAN,
+    WHITE
+};
 
 /**
  * @class Module
@@ -24,6 +68,7 @@ namespace arcade
 class Module
 {
     protected:
+        void _computeTextPosition(int &x, int &y, uint16_t alignment, uint16_t textWidth);
         struct {
             size_t w;
             size_t h;
@@ -38,10 +83,13 @@ class Module
                 return (uint16_t) h / hUnit;
             }
         } _size;
-        sf::RenderWindow _sfWindow;
+        sf::RenderWindow *_sfWindow;
         SDL_Surface *_sdlWindow;
         WINDOW *_ncWindow;
+
+        module _module;
     public:
+        const module &getModule() const;
         /**
          * @brief Create a window of type sf::RenderWindow or SDL_Surface* or WINDOW* depending on the graphical lib used.
          * 
@@ -113,6 +161,26 @@ class Module
          */
         virtual void render(const std::map<std::string, Object> &gamesData) = 0;
 
+        /**
+         * @brief Render text on the screen to given coordinates.
+         * 
+         * @param text Text to render on the screen.
+         * @param x X coordinates of the text in cols.
+         * @param y Y coordinates of the text in rows.
+         * @param alignment How the text is aligned: Left, center, right, top, middle or bottom.
+         * These flags can be combined like this: TOP | RIGHT.
+         * @param style The style applied to the text (NORMAL, BOLD, ITALIC, UNDERLINE)
+         * These flags can be combined like this: BOLD | ITALIC
+         * @param color The color applied to the text as a structure composed of r, g and field each defining
+         * the rate of red, green and blue.
+         */
+        virtual void renderText(const std::string &text, const int &x = 0, const int &y = 0, uint16_t alignment = TOP | LEFT, uint16_t style = NORMAL, color color = WHITE) = 0;
+
+        /**
+         * @brief Clear the whole screen.
+         * 
+         */
+        virtual void clear() = 0;
         /**
          * @brief Get the value of the current pressed key.
          * 

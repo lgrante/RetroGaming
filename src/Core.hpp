@@ -5,6 +5,7 @@
 #include "Module.hpp"
 #include "Game.hpp"
 #include "Object.hpp"
+#include "Errors.hpp"
 
 #include <dlfcn.h>
 
@@ -48,20 +49,33 @@ class Core
             void *handle = dlopen(libPath.c_str(), RTLD_LAZY);
 
             if (handle == nullptr)
-                return (T *) nullptr;
+                throw LoadSharedModuleException("Failed to load " + libPath, __FILE__, __LINE__);
             create = (T *(*)()) dlsym(handle, "create");
             *destroyer = (void (*)(T *)) dlsym(handle, "destroy");
+            if (create == nullptr || *destroyer == nullptr)
+                throw LoadSharedModuleException("Failed to fetch ctor and dtor symbols from " + libPath, __FILE__, __LINE__);
             classInstance = (T *) create();
             return classInstance;
         }
+
+        std::vector<std::string> _readDirectory(const std::string &path);
     public:
+        Core();
         Core(const std::string &gamePath, const std::string &modulePath);
 
         void setModule(const std::string &path);
         void setGame(const std::string &path);
 
+        const module &getModuleType() const;
         Module *getModule() const;
         Game *getGame() const;
+
+        /**
+         * @brief Launch the UI menu where user can choose a game and lib module.
+         * It's also possible to see users scores and to set username.
+         * 
+         */
+        void launch(const std::string &lib);
 };
 
 #endif

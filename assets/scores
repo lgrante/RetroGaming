@@ -1,0 +1,10 @@
+##
+#
+# Scores will be stored in this format
+#
+# USERNAME1:SCORE1
+# USERNAME2:SCORE2
+#
+# Comment line begin with '#'
+#
+##

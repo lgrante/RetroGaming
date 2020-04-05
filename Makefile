@@ -7,8 +7,8 @@ SRC					=	./src/Core.cpp \
 
 export CC			=	g++
 export RM			=	rm -f
-export LIBFLAGS	=	-lsfml-graphics -lsfml-system -lsfml-window -lSDL
-CXXFLAGS			=	-Wall -Wextra -Wno-delete-non-virtual-dtor -pedantic -I./src -I./src/games -I./src/lib -I./src/lib/ncurses -ldl
+export LIBFLAGS		=	-lsfml-graphics -lsfml-system -lsfml-window -lSDL -lncurses -ltinfo
+CXXFLAGS			=	-Wall -Wextra -Wno-delete-non-virtual-dtor -pedantic -ldl -I./src -I./src/games -I./src/lib -I./src/lib/ncurses
 
 export LIB_PREFIX	=	lib_arcade_
 GAMES_DIR			=	./src/games
@@ -18,18 +18,22 @@ EXEC				=	arcade
 all: core games graphicals
 
 core:
-	@printf "\e[1m\e[38;2;21;124;214mCompiling and linking $(EXEC)...\033[0m\n"
+	@printf "\e[1m\e[38;2;21;124;214m> Compiling and linking $(EXEC)...\033[0m\n"
+	@export LD_LIBRARY_PATH=$PWD/games:$PWD/lib:$LD_LIBRARY_PATH
 	@$(CC) -o $(EXEC) $(SRC) $(CXXFLAGS) $(LIBFLAGS)
 	@printf "\e[1m> Done.\033[0m\n"
 
 games:
 	@printf "\e[1m\e[38;2;21;124;214m> Compiling and linking game libraries...\033[0m\n"
-	@(cd $(GAMES_DIR) && $(MAKE) --no-print-directory)
+	@(cd $(GAMES_DIR) && $(MAKE) game_a --no-print-directory)
+	@(cd $(GAMES_DIR) && $(MAKE) game_b --no-print-directory)
 	@printf "\e[1m> Done.\033[0m\n"
 
 graphicals:
 	@printf "\e[1m\e[38;2;21;124;214m> Compiling and linking graphical libraries...\033[0m\n"
-	@(cd $(GRAPHICALS_DIR) && $(MAKE) --no-print-directory)
+	@(cd $(GRAPHICALS_DIR) && $(MAKE) ncurses --no-print-directory)
+	@(cd $(GRAPHICALS_DIR) && $(MAKE) sfml --no-print-directory)
+	@(cd $(GRAPHICALS_DIR) && $(MAKE) sdl --no-print-directory)
 	@printf "\e[1m> Done.\033[0m\n"
 
 clean:

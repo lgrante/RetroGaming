@@ -37,7 +37,28 @@ class SDLModule : public Module
          * @param gameDatas Current game data.
          */
         void render(const std::map<std::string, Object> &gamesData) final;
+        
+        /**
+         * @brief Render text on the screen to given coordinates.
+         * 
+         * @param text Text to render on the screen.
+         * @param x X coordinates of the text in cols.
+         * @param y Y coordinates of the text in rows.
+         * @param alignment How the text is aligned: Left, center, right, top, middle or bottom.
+         * These flags can be combined like this: TOP | RIGHT.
+         * @param style The style applied to the text (NORMAL, BOLD, ITALIC, UNDERLINE)
+         * These flags can be combined like this: BOLD | ITALIC
+         * @param color The color applied to the text as a structure composed of r, g and field each defining
+         * the rate of red, green and blue.
+         */
+        void renderText(const std::string &text, const int &x = 0, const int &y = 0, uint16_t alignment = TOP | LEFT, uint16_t style = NORMAL, color color = WHITE);
 
+        /**
+         * @brief Clear the whole screen.
+         * 
+         */
+        void clear();
+        
         /**
          * @brief Get the value of the current pressed key.
          * 

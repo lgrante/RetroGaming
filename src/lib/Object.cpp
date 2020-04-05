@@ -19,7 +19,7 @@ void Object::setTexture(const std::string &sfTexturePath, const std::string &ncT
      * @note Loading SFML Texture.
      */
     if (_sfTexture.loadFromFile(sfTexturePath) == false)
-        throw InitTextureException("Failed to laod texture from file" + sfTexturePath, __LINE__);
+        throw InitTextureException("Failed to laod texture from file" + sfTexturePath, __FILE__, __LINE__);
     _sprite = sf::Sprite(_sfTexture);
 
     /**

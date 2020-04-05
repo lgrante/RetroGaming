@@ -58,7 +58,7 @@ void NCurseTexture::setColor(
 {
     _ground = ground;
     if (red <= 0 || red >= 255 || green <= 0 || green >= 255 || blue <= 0 || blue >= 255)
-        throw InitTextureException("Failed to init texture with color", __LINE__);
+        throw InitTextureException("Failed to init texture with color",__FILE__, __LINE__);
     _red = red;
     _green = green;
     _blue = blue;
@@ -105,26 +105,26 @@ void NCurseTexture::loadFromFile(const std::string &texturePath)
                 if (words[1].size() == 1)
                     setCharacter(words[0][1]);
                 else
-                    throw InitTextureException("Failed to load texture from file", __LINE__);
+                    throw InitTextureException("Failed to load texture from file", __FILE__, __LINE__);
             } else if (words[0] == "COLOR") {
                 std::vector<std::string> c = _splitStr(words[1], ',');
 
                 if (c[0].size() != 1 || (c[0][0] != 'F' && c[0][0] != 'B'))
-                    throw InitTextureException("Failed to load texture from file", __LINE__);
+                    throw InitTextureException("Failed to load texture from file", __FILE__, __LINE__);
                 setColor((c[0][0] == 'B' ? BACKGROUND : FOREGROUND), std::stoi(c[1]), std::stoi(c[2]), std::stoi(c[3]));
             } else if (words[0] == "STYLE") {
                 std::vector<std::string> s = _splitStr(words[1], ',');
 
                 for (std::string i : s) {
                     if (styleStr.find(i) == styleStr.end())
-                        throw InitTextureException("Failed to load texture from file", __LINE__);
+                        throw InitTextureException("Failed to load texture from file", __FILE__, __LINE__);
                     style |= styleStr.at(i);
                 }
                 setStyle(style);
             }
         }
     } else
-        throw InitTextureException("Failed to load texture from file", __LINE__);
+        throw InitTextureException("Failed to load texture from file", __FILE__, __LINE__);
 }
 
 const std::string NCurseTexture::getTexture() const

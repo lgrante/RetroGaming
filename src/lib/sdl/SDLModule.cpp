@@ -1,5 +1,4 @@
 #include "SDLModule.hpp"
-#include <sys/ioctl.h>
 
 extern "C" Module *create()
 {
@@ -13,6 +12,7 @@ extern "C" void destroy(Module *module)
 
 SDLModule::SDLModule()
 {
+    _module = SDL;
 }
 
 SDLModule::~SDLModule()
@@ -22,6 +22,7 @@ SDLModule::~SDLModule()
 void SDLModule::initWindow(const size_t &width, const size_t &height, const std::string &title)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+    TTF_Init();
     struct winsize size;
 
     ioctl(1, TIOCGWINSZ, &size);
@@ -48,6 +49,22 @@ void SDLModule::render(const std::map<std::string, Object> &gamesData)
         SDL_BlitSurface(i.second.getSdlTexture(), NULL, _sdlWindow, &rect);
     }
     SDL_UpdateRect(_sdlWindow, 0, 0, 0, 0);
+}
+
+void SDLModule::renderText(const std::string &text, const int &x, const int &y, uint16_t alignment, uint16_t style, color color)
+{
+    int xPxl = x, yPxl = y, textWidth = 0;
+    SDL_Rect position;
+    TTF_Font *font = TTF_OpenFont(FONT_PATH, 24);
+    SDL_Color textColor = {0, 0, 0, 0};
+    SDL_Surface *textSurface  = nullptr;
+
+    TTF_SizeText(font, text.c_str(), &textWidth, NULL);
+    _computeTextPosition(xPxl, yPxl, alignment, textWidth);
+    position.x = (Sint16) xPxl;
+    position.y = (Sint16) yPxl;
+    textSurface = TTF_RenderText_Solid(font, text.c_str(), textColor);
+    SDL_BlitSurface(textSurface, NULL, _sdlWindow, &position);
 }
 
 int SDLModule::getInputs()

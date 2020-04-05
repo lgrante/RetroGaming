@@ -6,12 +6,11 @@
 class ArcadeException : public std::exception
 {
     protected:
-        const std::string _type;
         std::string _error;
     public:
-        ArcadeException(std::string error, uint16_t line)
+        ArcadeException(std::string error, uint16_t line, const char *filename, const std::string &type)
         {
-            _error = "[" + _type + "]: " + error + " at line " + std::to_string(line);
+            _error = "[" + type + "]: " + error + " at line " + std::to_string(line) + " in " + std::string(filename);
         }
 
         const char *what() const throw()
@@ -20,28 +19,39 @@ class ArcadeException : public std::exception
         }
 };
 
+class LoadSharedModuleException : public ArcadeException
+{
+    public:
+        LoadSharedModuleException(std::string error, const char *filename, uint16_t line) 
+            : ArcadeException(error, line, filename, "LoadSharedModuleException") {}
+};
+
 class InitWindowException : public ArcadeException
 {
-    protected:
-        const std::string _type = "InitWindowException";
     public:
-        InitWindowException(std::string error, uint16_t line) : ArcadeException(error, line) {}
+        InitWindowException(std::string error, const char *filename, uint16_t line) 
+            : ArcadeException(error, line, filename, "InitWindowException") {}
 };
 
 class InitKeyException : public ArcadeException
 {
-    protected:
-        const std::string _type = "InitKeyException";
     public:
-        InitKeyException(std::string error, uint16_t line) : ArcadeException(error, line) {}
+        InitKeyException(std::string error, const char *filename, uint16_t line) 
+            : ArcadeException(error, line, filename, "InitKeyException") {}
 };
 
 class InitTextureException : public ArcadeException
 {
-    protected:
-        const std::string _type = "InitTextureException";
     public:
-        InitTextureException(std::string error, uint16_t line) : ArcadeException(error, line) {}
+        InitTextureException(std::string error, const char *filename, uint16_t line) 
+            : ArcadeException(error, line, filename, "InitTextureException") {}
+};
+
+class InitTextException : public ArcadeException
+{
+    public:
+        InitTextException(std::string error, const char *filename, uint16_t line) 
+            : ArcadeException(error, line, filename, "InitTextException") {}
 };
 
 #endif
