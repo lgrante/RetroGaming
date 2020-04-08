@@ -18,8 +18,7 @@ class PacmanGame : public Game
         int _wallNb;
         int _pacgumNb;
         int _bigPacgumNb;
-        int _exitLeftNb;
-        int _exitRightNb;
+        int _exitNb;
     public:
         PacmanGame();
         ~PacmanGame();
