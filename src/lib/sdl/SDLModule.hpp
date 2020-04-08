@@ -30,7 +30,7 @@ class SDLModule : public Module
          * 
          */
         void destroyWindow() final;
-
+        
         /**
          * @brief Render all the object of the current game data.
          * 
@@ -51,7 +51,7 @@ class SDLModule : public Module
          * @param color The color applied to the text as a structure composed of r, g and field each defining
          * the rate of red, green and blue.
          */
-        void renderText(const std::string &text, const int &x = 0, const int &y = 0, uint16_t alignment = TOP | LEFT, uint16_t style = NORMAL, color color = WHITE);
+        void renderText(const std::string &text, const int &x = 0, const int &y = 0, uint16_t alignment = TOP | LEFT, uint16_t style = NORMAL, color color = DEFAULT);
 
         /**
          * @brief Clear the whole screen.

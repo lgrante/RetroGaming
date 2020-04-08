@@ -54,20 +54,62 @@ void SDLModule::destroyWindow()
 
 void SDLModule::render(const std::map<std::string, Object> &gamesData)
 {
-    /*
     SDL_Rect rect = {0, 0, _size.wUnit, _size.hUnit};
+    SDL_Surface *screen = SDL_GetWindowSurface(_sdlWindow);
 
     for (std::pair<std::string, Object> i : gamesData) {
         rect.x = i.second.getX();
         rect.y = i.second.getY();
-        SDL_BlitSurface(i.second.getSdlTexture(), NULL, _sdlWindow, &rect);
+
+        SDL_BlitSurface(i.second.getSdlTexture(), NULL, screen, &rect);
     }
-    SDL_UpdateRect(_sdlWindow, 0, 0, 0, 0);
-    */
+    SDL_UpdateWindowSurface(_sdlWindow);
 }
 
 void SDLModule::renderText(const std::string &text, const int &x, const int &y, uint16_t alignment, uint16_t style, color color)
 {
+        std::map<enum color, SDL_Color> sdlColors = {
+        {BLACK, {0, 0, 0, 255}},
+        {RED, {255, 0, 0, 255}},
+        {GREEN, {0, 255, 0, 255}},
+        {YELLOW, {255, 255, 0, 255}},
+        {BLUE, {0, 0, 255, 255}},
+        {MAGENTA, {255, 0, 255, 255}},
+        {CYAN, {0, 255, 255, 255}},
+        {WHITE, {255, 255, 255, 255}},
+        {DEFAULT, {255, 255, 255, 255}}
+    };
+    std::map<textStyle, int> sdlStyle = {
+        {NORMAL, TTF_STYLE_NORMAL},
+        {BOLD, TTF_STYLE_BOLD},
+        {ITALIC, TTF_STYLE_ITALIC},
+        {UNDERLINE, TTF_STYLE_UNDERLINE}
+    };
+
+    int xPxl = x, yPxl = y;
+    SDL_Rect position;
+
+    SDL_Surface *screen = SDL_GetWindowSurface(_sdlWindow);
+
+    TTF_Font *font = TTF_OpenFont(FONT_PATH, 32);
+    SDL_Surface *textSurface = nullptr;
+    SDL_Color textColor = sdlColors.at(color);
+
+    for (std::pair<textStyle, int> i : sdlStyle)
+        if (i.first & style)
+            TTF_SetFontStyle(font, i.second);
+
+    textSurface = TTF_RenderText_Solid(font, text.c_str(), textColor);
+    _computePosition(xPxl, yPxl, alignment, textSurface->w);
+    position.x = (Sint16) xPxl;
+    position.y = (Sint16) yPxl;
+
+    SDL_BlitSurface(textSurface, NULL, screen, &position);
+    SDL_UpdateWindowSurface(_sdlWindow);
+
+    TTF_CloseFont(font);
+    SDL_FreeSurface(textSurface);
+    /*
     std::map<enum color, SDL_Color> sdlColors = {
         {BLACK, {0, 0, 0, 255}},
         {RED, {255, 0, 0, 255}},
@@ -76,7 +118,8 @@ void SDLModule::renderText(const std::string &text, const int &x, const int &y, 
         {BLUE, {0, 0, 255, 255}},
         {MAGENTA, {255, 0, 255, 255}},
         {CYAN, {0, 255, 255, 255}},
-        {WHITE, {255, 255, 255, 255}}
+        {WHITE, {255, 255, 255, 255}},
+        {DEFAULT, {255, 255, 255, 255}}
     };
     std::map<textStyle, int> sdlStyle = {
         {NORMAL, TTF_STYLE_NORMAL},
@@ -100,7 +143,7 @@ void SDLModule::renderText(const std::string &text, const int &x, const int &y, 
     textSurface = TTF_RenderText_Solid(font, text.c_str(), textColor);
     textTexture = SDL_CreateTextureFromSurface(_sdlRenderer, textSurface);
     SDL_QueryTexture(textTexture, NULL, NULL, &w, &h);
-    _computeTextPosition(xPxl, yPxl, alignment, w);
+    _computePosition(xPxl, yPxl, alignment, w);
     position.x = (Sint16) xPxl;
     position.y = (Sint16) yPxl;
     position.w = (Sint16) w;
@@ -112,12 +155,17 @@ void SDLModule::renderText(const std::string &text, const int &x, const int &y, 
     TTF_CloseFont(font);
     SDL_DestroyTexture(textTexture);
     SDL_FreeSurface(textSurface);
+    */
 }
 
 void SDLModule::clear()
 {
+    SDL_Surface *screen = SDL_GetWindowSurface(_sdlWindow);
+    SDL_FillRect(screen, NULL, 0x000000);
+    /*
     SDL_SetRenderDrawColor(_sdlRenderer, 0, 0, 0, 255);
     SDL_RenderClear(_sdlRenderer);
+    */
 }
 
 int SDLModule::getInputs()

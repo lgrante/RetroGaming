@@ -2,13 +2,12 @@ SRC					=	./src/Core.cpp \
 						./src/games/Game.cpp \
 						./src/lib/Module.cpp \
 						./src/lib/Object.cpp \
-						./src/lib/ncurses/NCurseTexture.cpp \
 						./src/main.cpp
 
 export CC			=	g++
 export RM			=	rm -f
 export LIBFLAGS		=	-lsfml-graphics -lsfml-system -lsfml-window -lSDL2 -lSDL2_ttf -lSDL2_image -lncurses -ltinfo
-CXXFLAGS			=	-g3 -Wall -Wextra -Wno-delete-non-virtual-dtor -pedantic -ldl -I./src -I./src/games -I./src/lib -I./src/lib/ncurses
+CXXFLAGS			=	-g3 -Wall -Wextra -Wno-reorder -Wno-delete-non-virtual-dtor -pedantic -ldl -I./src -I./src/games -I./src/lib -I./src/lib/ncurses 
 
 export LIB_PREFIX	=	lib_arcade_
 GAMES_DIR			=	./src/games

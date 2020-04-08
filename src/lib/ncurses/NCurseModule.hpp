@@ -3,6 +3,10 @@
 
 #include "Module.hpp"
 
+#define FG_COLOR_BEGIN 1
+#define BG_COLOR_BEGIN 10
+#define PAIR_COLOR_BEGIN 20
+
 namespace arcade
 {
     class NCurseModule;
@@ -12,6 +16,23 @@ class NCurseModule : public Module
 {
     private:
         int _colorPair;
+        std::map<textStyle, int> _ncStyles = {
+            {NORMAL, A_NORMAL},
+            {BOLD, A_BOLD},
+            {ITALIC, A_ITALIC},
+            {UNDERLINE, A_UNDERLINE}
+        };
+
+        int _getColorPair(int fg, int bg)
+        {
+            if (fg == -1 && bg == -1)
+                return COLOR_PAIR(0);
+            if (bg == -1)
+                return COLOR_PAIR(FG_COLOR_BEGIN + fg);
+            if (fg == -1)
+                return COLOR_PAIR(BG_COLOR_BEGIN + bg);
+            return COLOR_PAIR(PAIR_COLOR_BEGIN + ((fg * 8) + bg));
+        }
     public:
         NCurseModule();
         ~NCurseModule();
@@ -32,7 +53,7 @@ class NCurseModule : public Module
          * 
          */
         void destroyWindow() final;
-
+        
         /**
          * @brief Render all the object of the current game data.
          * 
@@ -53,7 +74,7 @@ class NCurseModule : public Module
          * @param color The color applied to the text as a structure composed of r, g and field each defining
          * the rate of red, green and blue.
          */
-        void renderText(const std::string &text, const int &x = 0, const int &y = 0, uint16_t alignment = TOP | LEFT, uint16_t style = NORMAL, color color = WHITE);
+        void renderText(const std::string &text, const int &x = 0, const int &y = 0, uint16_t alignment = TOP | LEFT, uint16_t style = NORMAL, color color = DEFAULT);
 
         /**
          * @brief Clear the whole screen.

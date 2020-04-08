@@ -16,6 +16,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <dirent.h>

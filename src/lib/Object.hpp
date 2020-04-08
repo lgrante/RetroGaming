@@ -1,9 +1,9 @@
-#ifndef OBJECT_H
-#define OBJECT_H
+#ifndef __OBJECT_H__
+#define __OBJECT_H__
 
 #include "Main.hpp"
 #include "Errors.hpp"
-#include "NCurseTexture.hpp"
+#include "Constants.hpp"
 
 class Object
 {
@@ -13,27 +13,34 @@ class Object
         int _width;
         int _height;
 
-        std::map<std::string, void *> _data;
+        std::shared_ptr<sf::Sprite> _sfSprite;
+        std::shared_ptr<sf::Texture> _sfTexture;
 
-        sf::Sprite _sprite;
-        sf::Texture _sfTexture;
-        SDL_Texture *_sdlTexture;
-        NCurseTexture _ncTexture;
+        SDL_Surface *_sdlTexture;
+
+        wchar_t _ncTexture;
+        color _ncFgColor; 
+        color _ncBgColor;
+        uint16_t _ncStyle;
+
+        std::vector<std::string> _splitStr(const std::string &line, char split);
+        void _loadNCurseTexture(const std::string &texturePath);
     public:
-        Object() = default;
-        Object(const std::string &sfTexturePath, const std::string &sdlTexturePath, const std::string &ncTexturePath);
-        Object(const std::string &sfTexturePath, const std::string &sdlTexturePath, const std::string &ncTexturePath, const int &x = 0, const int &y = 0);
+        Object();
 
-        void setTexture(const std::string &sfTexturePath, const std::string &sdlTexturePath, const std::string &ncTexturePath);
+        void setTexture(const std::string &graphicTexturePath, const std::string &textTexturePath);
         void setX(int x);
         void setY(int y);
         void setWidth(int width);
         void setHeight(int height);
-
-        const sf::Sprite &getSfSprite() const;
-        const sf::Texture &getSfTexture() const;
-        SDL_Texture *getSdlTexture() const;
-        const NCurseTexture &getNcTexture() const;
+        
+        sf::Sprite *getSfSprite() const;
+        sf::Texture *getSfTexture() const;
+        SDL_Surface *getSdlTexture() const;
+        const wchar_t &getNcTexture() const;
+        const color &getNcFgColor() const;
+        const color &getNcBgColor() const;
+        const uint16_t &getNcStyle() const;
         const int &getX() const;
         const int &getY() const;
         const int &getWidth() const;

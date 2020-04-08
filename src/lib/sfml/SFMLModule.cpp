@@ -37,7 +37,7 @@ void SFMLModule::destroyWindow()
 void SFMLModule::render(const std::map<std::string, Object> &gameDatas)
 {
     for (std::pair<std::string, Object> i : gameDatas)
-        _sfWindow->draw(i.second.getSfSprite());
+        _sfWindow->draw(*(i.second.getSfSprite()));
     _sfWindow->display();
 }
 
@@ -55,7 +55,8 @@ void SFMLModule::renderText(const std::string &text, const int &x, const int &y,
         {BLUE, sf::Color(0, 0, 255)},
         {MAGENTA, sf::Color(255, 0, 255)},
         {CYAN, sf::Color(0, 255, 255)},
-        {WHITE, sf::Color(255, 255, 255)}
+        {WHITE, sf::Color(255, 255, 255)},
+        {DEFAULT, sf::Color(255, 255, 255)}
     };
     std::map<textStyle, sf::Text::Style> sfStyles = {
         {BOLD, sf::Text::Bold},
@@ -74,7 +75,7 @@ void SFMLModule::renderText(const std::string &text, const int &x, const int &y,
             renderText.setStyle(i.second);
 
     rect = renderText.getLocalBounds();
-    _computeTextPosition(xPxl, yPxl, alignment, rect.width);
+    _computePosition(xPxl, yPxl, alignment, rect.width);
     renderText.setPosition(xPxl, yPxl);
 
     _sfWindow->draw(renderText);

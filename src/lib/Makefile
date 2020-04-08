@@ -1,5 +1,4 @@
 SRC_NCURSES			=	./ncurses/NCurseModule.cpp \
-						./ncurses/NCurseTexture.cpp \
 						./Object.cpp \
 						./Module.cpp
 OBJ_NCURSES			=	$(SRC_NCURSES:.cpp=.o)
@@ -14,7 +13,7 @@ SRC_SDL				=	./sdl/SDLModule.cpp \
 						./Module.cpp
 OBJ_SDL				=	$(SRC_SDL:.cpp=.o)
 
-CXXFLAGS			=	-Wall -Wextra -Wno-delete-non-virtual-dtor -pedantic -I./ -I../ -I./ncurses -I./sfml -c -fpic
+CXXFLAGS			=	-g3 -Wall -Wextra -Wno-reorder -Wno-implicit-fallthrough -Wno-deprecated-declarations -Wno-delete-non-virtual-dtor -pedantic -I./ -I../ -I./ncurses -I./sfml -c -fpic
 LDFLAGS				=	-shared
 
 BUILD_DIR			=	../../build

@@ -47,6 +47,8 @@ class Core
         std::vector<std::string>::iterator _currentGame;
         std::map<int, std::pair<std::string, std::string>, std::greater<int>> _scores;
 
+        bool _inGame;
+
         template <typename T>
         T *_loadSharedClass(const std::string &libPath, void (**destroyer)(T *))
         {
@@ -70,9 +72,10 @@ class Core
         std::map<int, std::pair<std::string, std::string>, std::greater<int>> _readScores();
         std::vector<std::string> _splitStr(const std::string &line, char split);
 
-        void _readModuleKey(const int &key, bool &exit);
-        void _scoreMenu(const std::string &lib);
-        void _mainMenu(const std::string &lib);
+        void _readModuleKey(const int &key);
+        void _scoreMenu();
+        void _mainMenu();
+        void _exit();
     public:
         Core();
         Core(const std::string &gamePath, const std::string &modulePath);
@@ -83,6 +86,21 @@ class Core
         const module &getModuleType() const;
         Module *getModule() const;
         Game *getGame() const;
+
+        /**
+         * @brief Initialize the _data map then call coreGame() in loop.
+         * 
+         * coreGame(), isEndGame(), enGame(), isGameRestart() are stored into
+         * Game class.
+         * 
+         * Call coreGame() in loop until isEndGame() returns true. If isEndGame() 
+         * returns true its calls endGame() and isGameRestart() in loop. 
+         * endGame() prints out end game screen. If isGameRestart() returns 
+         * true the game restart otherwise it leaves the game and go back to 
+         * the arcade main menu.
+         * 
+         */
+        void launchGame();
 
         /**
          * @brief Launch the UI menu where user can choose a game and lib module.

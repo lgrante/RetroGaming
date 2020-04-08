@@ -1,12 +1,12 @@
 #include "Core.hpp"
 
 Core::Core()
-    : _module(nullptr), _moduleDestroyer(nullptr), _game(nullptr), _gameDestroyer(nullptr)
+    : _module(nullptr), _moduleDestroyer(nullptr), _game(nullptr), _gameDestroyer(nullptr), _inGame(false)
 {
 }
 
 Core::Core(const std::string &gamePath, const std::string &modulePath)
-    : _module(nullptr), _moduleDestroyer(nullptr), _game(nullptr), _gameDestroyer(nullptr)
+    : _module(nullptr), _moduleDestroyer(nullptr), _game(nullptr), _gameDestroyer(nullptr), _inGame(false)
 {
     setGame(gamePath);
     setModule(modulePath);
@@ -32,17 +32,19 @@ void Core::setModule(const std::string &path)
 
 void Core::setGame(const std::string &path)
 {
-    std::map<const std::string, std::map<std::string, Object>>::iterator it; 
+    //std::map<const std::string, std::map<std::string, Object>>::iterator it = _gamesData.end(); 
 
     /**
      * @note First we save the current game data and then we destroy it. 
      */
     if (_game != nullptr) {
+        /*
         it = _gamesData.find(_game->getName());
         if (it == _gamesData.end())
             _gamesData.emplace(_game->getName(), _game->getData());
         else
             _gamesData.at(_game->getName()) = _game->getData();
+        */    
         if (_gameDestroyer != nullptr)
             _gameDestroyer(_game);
         else if (_game != nullptr)
@@ -61,9 +63,8 @@ void Core::setGame(const std::string &path)
      * @note We launch the game and if the game has alredy been loaded before
      * we store back its data into it.
      */
-    _game->launchGame();
-    if (it != _gamesData.end())
-        _game->setData(it->second);
+    //if (it != _gamesData.end())
+    //    _game->setData(it->second);
 }
 
 const module &Core::getModuleType() const
@@ -136,7 +137,7 @@ std::vector<std::string> Core::_splitStr(const std::string &line, char split)
     return words;
 }
 
-void Core::_readModuleKey(const int &key, bool &exit)
+void Core::_readModuleKey(const int &key)
 {
     switch (key) {
         case 'a':
@@ -153,17 +154,20 @@ void Core::_readModuleKey(const int &key, bool &exit)
             break;
         case 'q':
         case 27:
-            exit = true;
+            _exit();
             break;
     }
     if (key == 'a' || key == 'z') {
         _module->destroyWindow();
         setModule("./lib/" + *_currentLib);
         _module->initWindow(100, 40, "ARCADE");
+    } else if ((key == 'o' || key == 'p') && _inGame) {
+        setGame("./games/" + *_currentGame);
+        launchGame();
     }
 }
 
-void Core::_scoreMenu(const std::string &lib)
+void Core::_scoreMenu()
 {
     int i = 1, input = -1;
     bool exit = false;
@@ -171,29 +175,28 @@ void Core::_scoreMenu(const std::string &lib)
     _module->clear();
     while (!exit) {
         i = 1;
-        _module->renderText("Score menu", 0, 2, TOP | CENTER, BOLD | UNDERLINE);
-        _module->renderText("[Q]/[ESC]: Quit score menu", 0, 6, TOP | CENTER, ITALIC);
+        _module->renderText("Score menu", 0, 2, TOP | CENTER, BOLD | UNDERLINE, WHITE);
+        _module->renderText("[H]: Quit score menu", 0, 6, TOP | CENTER, ITALIC, WHITE);
         if (_scores.size() == 0)
-            std::cout << "No scores..." << std::endl;
+            _module->renderText("No scores...", 0, 8, TOP | CENTER, BOLD | ITALIC);
         else {
             for (auto it : _scores) {
-                _module->renderText(std::to_string(i) + ". " + it.second.first, 25, 8 + i, TOP | LEFT, BOLD);
+                _module->renderText(std::to_string(i) + ". " + it.second.first, 25, 8 + i, TOP | LEFT, BOLD, WHITE);
                 _module->renderText(":", 0, 8 + i, TOP | CENTER);
                 _module->renderText(std::to_string(it.first) + "(" + it.second.second + ")", -25, 8 + i, TOP | RIGHT, NORMAL, GREEN);
                 i++;
             }
         }
-        switch ((input = _module->getInputs())) {
-            default:
-                _readModuleKey(input, exit);
-        }
+        if ((input = _module->getInputs()) == 'h')
+            exit = true;
+        _readModuleKey(input);
     }
-    _mainMenu(lib);
+    _module->clear();
 }
 
-void Core::_mainMenu(const std::string &lib)
+void Core::_mainMenu()
 {
-    bool exit = false, insertMode = false;
+    bool insertMode = false;
     int input = 0;
     std::string username = "";
 
@@ -201,11 +204,11 @@ void Core::_mainMenu(const std::string &lib)
     /**
      * @note Main loop to display menu.
      */
-    while (!exit) {
+    while (1) {
         /**
          * @note First display the keys.
          */
-        _module->renderText("Welcome on Arcade !", 0, 2, TOP | CENTER, BOLD | UNDERLINE, CYAN);
+        _module->renderText("Welcome on Arcade !", 0, 2, TOP | CENTER, BOLD | UNDERLINE, WHITE);
         _module->renderText("[Q]/[ESC]: Quit the program", 0, 6, TOP | CENTER, ITALIC);
         _module->renderText("[A]: Previous lib / [Z]: Next lib", 0, 7, TOP | CENTER, ITALIC);
         _module->renderText("[O]: Previous game / [P]: Next game", 0, 8, TOP | CENTER, ITALIC);
@@ -217,14 +220,14 @@ void Core::_mainMenu(const std::string &lib)
         /**
          * @note Then display the games and libs.
          */
-        _module->renderText((_libs.size() == 0) ? "No libs found..." : "List of library:", 0, 15, TOP | CENTER, BOLD);
+        _module->renderText((_libs.size() == 0) ? "No libs found..." : "List of library:", 0, 15, TOP | CENTER, BOLD, WHITE);
         for (size_t i = 0; i < _libs.size(); i++)
-            _module->renderText(_libs[i], 0, 17 + i, TOP | CENTER, NORMAL, (_libs[i] == *_currentLib) ? CYAN : WHITE);
-        _module->renderText((_games.size() == 0) ? "No games found..." : "List of game:", 0, 23, TOP | CENTER, BOLD);
+            _module->renderText(_libs[i], 0, 17 + i, TOP | CENTER, NORMAL, (_libs[i] == *_currentLib) ? CYAN : DEFAULT);
+        _module->renderText((_games.size() == 0) ? "No games found..." : "List of game:", 0, 23, TOP | CENTER, BOLD, WHITE);
         for (size_t i = 0; i < _games.size(); i++)
-            _module->renderText(_games[i], 0, 25 + i, TOP | CENTER, NORMAL, (_games[i] == *_currentGame) ? CYAN : WHITE);
-        _module->renderText("USERNAME", 0, 31, TOP | CENTER, BOLD | ITALIC);
-        _module->renderText("[" + username + "]", 0, 32, TOP | CENTER, ITALIC);
+            _module->renderText(_games[i], 0, 25 + i, TOP | CENTER, NORMAL, (_games[i] == *_currentGame) ? CYAN : DEFAULT);
+        _module->renderText("USERNAME", 0, 31, TOP | CENTER, BOLD | ITALIC, WHITE);
+        _module->renderText("[" + username + "]", 0, 32, TOP | CENTER, ITALIC | BOLD);
 
         /**
          * @note And last we read the keys pressed by user and process it.
@@ -240,26 +243,105 @@ void Core::_mainMenu(const std::string &lib)
             insertMode = false;
         } else if (!insertMode) {
             switch (input) {
-                case 'q':
-                case 27:
-                    exit = true;
-                    break;
                 case 'i':
                     _module->clear();
                     insertMode = true;
                     break;
                 case 's':
-                    _scoreMenu(lib);
+                    _scoreMenu();
                     break;
                 case 13:
                     _module->clear();
                     setGame("./games/" + *_currentGame);
+                    launchGame();
                     break;
                 default:
-                    _readModuleKey(input, exit);
+                    _readModuleKey(input);
             }
         }
     }
+}
+
+void Core::_exit()
+{
+    if (_game != nullptr) {
+        if (_gameDestroyer == nullptr)
+            delete(_game);
+        else
+            _gameDestroyer(_game);
+    }
+    if (_module != nullptr) {
+        _module->destroyWindow();
+        if (_moduleDestroyer == nullptr)
+            delete(_module);
+        else
+            _moduleDestroyer(_module);
+    }
+    exit(0);
+}
+
+void Core::launchGame()
+{
+    int input = -1;
+
+    if (_game == nullptr)
+        return;
+
+    /**
+     * @note First we launch the game.
+     */
+    _module->clear();
+    _inGame = true;
+    _game->initGame();
+
+    /**
+     * @note Here is the game loop.
+     */
+    bool debug = false;
+    while (!(debug = _game->isEndGame())) {
+        input = _game->coreGame();
+        _readModuleKey(input);
+        if (input == 'r') {
+            _module->clear();
+            _game->endGame();
+            _game->initGame();
+        }
+        if (input == 'h') {
+            _game->endGame();
+            _module->clear();
+            return;
+        }
+    }
+    
+    /**
+     * @note Exiting the while loop upper means that the game is over
+     * in this case we print out Game Over screen.
+     */
+    _game->endGame();
+    _module->clear();
+    for (int i = -30; i <= -5; i++) {
+        _module->clear();
+        _module->renderText("GAME OVER!", 0, i, CENTER | MIDDLE, NORMAL, RED);
+        _readModuleKey(_module->getInputs());
+        usleep(100000);
+    }
+    while (1) {
+        // Reprint GAME OVER to keep it on the screen wether the module changes.
+        _module->renderText("GAME OVER!", 0, -5, CENTER | MIDDLE, NORMAL, RED);
+        _module->renderText("Score:", 40, 0, LEFT | MIDDLE, BOLD, WHITE);
+        _module->renderText(std::to_string(_game->getScore()), -40, 0, RIGHT | MIDDLE, NORMAL, GREEN);
+        _module->renderText("[R]: Restart game", 0, 4, CENTER | MIDDLE, ITALIC, WHITE);
+        _module->renderText("[H]: Go back to main menu", 0, 5, CENTER | MIDDLE, ITALIC, WHITE);
+        input = _module->getInputs();
+        _readModuleKey(input);
+        if (input == 'r')
+            break;
+        else if (input == 'h') {
+            _module->clear();
+            return;
+        }
+    }
+    launchGame();
 }
 
 void Core::launch(const std::string &lib)
@@ -280,6 +362,6 @@ void Core::launch(const std::string &lib)
      * @note Open the main menu.
      */
     _module->initWindow(100, 40, "ARCADE");
-    _mainMenu(lib);
+    _mainMenu();
     _module->destroyWindow();
 }

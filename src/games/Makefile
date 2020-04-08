@@ -1,18 +1,18 @@
-SRC_A				=	./gameA/GameA.cpp \
+SRC_A				=	./nibbler/NibblerGame.cpp \
 						./Game.cpp
 OBJ_A				=	$(SRC_A:.cpp=.o)
 
-SRC_B				=	./gameB/GameB.cpp \
+SRC_B				=	./pacman/PacmanGame.cpp \
 						./Game.cpp
 OBJ_B				=	$(SRC_B:.cpp=.o)
 
-CXXFLAGS			=	-Wall -Wextra -Wno-delete-non-virtual-dtor -pedantic -I../ -I./ -I./gameA -I./gameB -I../lib -I../lib/ncurses -c -fpic
+CXXFLAGS			=	-g3 -Wall -Wextra -Wno-reorder -Wno-implicit-fallthrough -Wno-delete-non-virtual-dtor -pedantic -I../ -I./ -I./nibbler -I./gameB -I../lib -I../lib/ncurses -c -fpic
 LDFLAGS				=	-shared
 
 BUILD_DIR			=	../../build
 TARGET_DIR			=	../../games
-GAME_A_NAME			=	$(LIB_PREFIX)game_a.so
-GAME_B_NAME			=	$(LIB_PREFIX)game_b.so
+GAME_A_NAME			=	$(LIB_PREFIX)game_nibbler.so
+GAME_B_NAME			=	$(LIB_PREFIX)game_pacman.so	
 
 
 game_a: $(OBJ_A)

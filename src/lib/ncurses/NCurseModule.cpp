@@ -38,6 +38,7 @@ void NCurseModule::initWindow(const size_t &width, const size_t &height, const s
     use_default_colors();
     cbreak();
     noecho();
+    nodelay(_ncWindow, TRUE);
     err_stat = keypad(_ncWindow, TRUE);
     if (err_stat == ERR) {
         endwin();
@@ -47,13 +48,31 @@ void NCurseModule::initWindow(const size_t &width, const size_t &height, const s
     wattron(_ncWindow, A_BOLD);
     mvwprintw(_ncWindow, 0, (width / 2) - (title.size() / 2), title.c_str());
     wattroff(_ncWindow, A_BOLD);
-    wrefresh(_ncWindow);
-    _size.w = width;
-    _size.h = height;
-    _size.wUnit = 1;
-    _size.hUnit = 1;
-    for (int color = COLOR_BLACK; color <= COLOR_WHITE; color++)
-        init_pair(color + 1, color, -1);
+    _size.wUnit = 1920 / size.ws_col;
+    _size.hUnit = 1080 / size.ws_row;
+    _size.w = width * _size.wUnit;
+    _size.h = height * _size.hUnit;
+
+    /**
+     * @note Default background and foreground color.
+     */
+    init_pair(0, -1, -1);
+    /**
+     * @note Only foreground colors, from 1 to 8.
+     */
+    for (int color = BLACK; color <= WHITE; color++)
+        init_pair(color + FG_COLOR_BEGIN, color, -1);
+    /**
+     * @note Only background colors, from 10 to 17.
+     */
+    for (int color = BLACK; color <= WHITE; color++)
+        init_pair(color + BG_COLOR_BEGIN, -1, color);
+    /**
+     * @note And all color pairs (background and foreground) from 20 to 83.
+     */
+    for (int i = BLACK; i <= WHITE; i++)
+        for (int j = BLACK; j <= WHITE; j++)
+            init_pair(PAIR_COLOR_BEGIN + ((i * 8) + j), i, j);
 }
 
 void NCurseModule::destroyWindow()
@@ -65,32 +84,53 @@ void NCurseModule::destroyWindow()
  * @note In render and renderText I add 1 to Y and X because 0 coordinates is the border of the box.
  * 
  */
-
 void NCurseModule::render(const std::map<std::string, Object> &gamesData)
 {
-    for (std::pair<std::string, Object> i : gamesData)
-        mvwprintw(_ncWindow, i.second.getY() + 1, i.second.getX() + 1, i.second.getNcTexture().getTexture().c_str());
+    for (std::pair<std::string, Object> i : gamesData) {
+        uint16_t style = i.second.getNcStyle();
+        color fgColor = i.second.getNcFgColor();
+        color bgColor = i.second.getNcBgColor();
+        std::string texture;
+
+        /**
+         * @note Setting character, style and color.
+         */
+        texture.push_back(i.second.getNcTexture());
+        for (std::pair<textStyle, int> s : _ncStyles)
+            if (style & s.first)
+                wattron(_ncWindow, s.second);
+        wattron(_ncWindow, _getColorPair(fgColor, bgColor));
+
+        mvwprintw(_ncWindow, (i.second.getY() + 1) / _size.hUnit, (i.second.getX() + 1) / _size.wUnit, texture.c_str());
+        
+        /**
+         * @note Unsetting color and style.
+         */
+        wattroff(_ncWindow, _getColorPair(fgColor, bgColor));
+        for (std::pair<textStyle, int> s : _ncStyles)
+            if (style & s.first)
+                wattroff(_ncWindow, s.second);
+    }
     wrefresh(_ncWindow);
 }
 
 void NCurseModule::renderText(const std::string &text, const int &x, const int &y, uint16_t alignment, uint16_t style, color color)
 {
-    std::map<textStyle, int> ncStyles = {
-        {NORMAL, A_NORMAL},
-        {BOLD, A_BOLD},
-        {ITALIC, A_ITALIC},
-        {UNDERLINE, A_UNDERLINE}
-    };
-    int xPxl = x + 1, yPxl = y + 1;
 
-    _computeTextPosition(xPxl, yPxl, alignment, text.size());
-    for (std::pair<textStyle, int> i : ncStyles)
+    int xPxl = x + 1, yPxl = y + 1;
+    size_t len = text.size();
+
+    xPxl += (alignment & CENTER) ? ((_size.getWidthInUnit() / 2) - (len / 2)) : 0;
+    xPxl += (alignment & RIGHT) ? ((_size.getWidthInUnit() - 1) - len) : 0;
+    yPxl += (alignment & MIDDLE) ? (_size.getHeightInUnit() / 2) : 0;
+    yPxl += (alignment & BOTTOM) ? (_size.getHeightInUnit() - 3) : 0;
+    for (std::pair<textStyle, int> i : _ncStyles)
         if (style & i.first)
             wattron(_ncWindow, i.second);
-    wattron(_ncWindow, COLOR_PAIR(color + 1));
+    wattron(_ncWindow, _getColorPair(color, -1));
     mvwprintw(_ncWindow, yPxl, xPxl, text.c_str());
-    wattroff(_ncWindow, COLOR_PAIR(color + 1));
-    for (std::pair<textStyle, int> i : ncStyles)
+    wattroff(_ncWindow, _getColorPair(color, -1));
+    for (std::pair<textStyle, int> i : _ncStyles)
         if (style & i.first)
             wattroff(_ncWindow, i.second);
     wrefresh(_ncWindow);
