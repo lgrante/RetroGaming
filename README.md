@@ -5,8 +5,13 @@
 RetroGaming works like an old arcade. You can play games like *Snake* or *Pacman*!
 It works with a plug-in system: you can load and unload dynamic libraries (.so files on *Linux*).
 So you have two directories:
-- ****games**** -> Stores game files.
-- **libs** -> Stores graphical librairy files.
+- ****games**** -> Stores game files. Available games:
+    - *Snake*
+    - *Pacman*
+- **libs** -> Stores graphical librairy files. Available directories:
+    - *SFML*
+    - *SDL*
+    - *Ncurse*
 
 When you launch the executable file you'll have a menu. From this menu you can choose a game and the graphical librairy to be used and then launch the game.
 
