@@ -8,7 +8,7 @@ So you have two directories:
 - ****games**** -> Stores game files. Available games:
     - *Snake*
     - *Pacman*
-- **libs** -> Stores graphical librairy files. Available directories:
+- **libs** -> Stores graphical librairy files. Available librairies:
     - *SFML*
     - *SDL*
     - *Ncurse*
