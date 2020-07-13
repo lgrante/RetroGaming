@@ -4,7 +4,7 @@
 
 RetroGaming works like an old arcade. You can play games like *Snake* or *Pacman*!
 It works with a plug-in system: you can load and unload dynamic libraries (.so files on *Linux*).
-So you have to directories:
+So you have two directories:
 - ****games**** -> Stores game files.
 - **libs** -> Stores graphical librairy files.
 
